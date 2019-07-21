@@ -86,20 +86,16 @@ end
 
 --[[**
 	Initializes RbxWeb.
-	@param [InstanceOrFunction] DataModel This should either be `game` for the default DataStoreService or `require` for MockDataStoreService.
+	@param DataModel [InstanceOrFunction] This should either be `game` for the default DataStoreService or `require` for MockDataStoreService.
 	@returns void
 **--]]
 function RbxWeb:Initialize(DataModel)
-	if not DataStoreService then
-		local Type = typeof(DataModel)
-		if Type == "Instance" and DataModel == game then
-			DataStoreService, UsingMock = DataModel:GetService("DataStoreService"), false
-		elseif Type == "function" and DataModel == require then -- Can't be too safe.
-			DataStoreService, UsingMock = unpack(DataModel(script.DataStoreService))
-			print(UsingMock)
-		end
-	else
-		warn("RbxWeb is already initialized!", debug.traceback(2))
+	assert(DataStoreService == nil, "You already initialized RbxWeb!")
+	local Type = typeof(DataModel)
+	if Type == "Instance" and DataModel == game then
+		DataStoreService, UsingMock = DataModel:GetService("DataStoreService"), false
+	elseif Type == "function" and DataModel == require then -- Can't be too safe.
+		DataStoreService, UsingMock = unpack(DataModel(script.DataStoreService))
 	end
 end
 
