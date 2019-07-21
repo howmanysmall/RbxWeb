@@ -1,0 +1,3 @@
+[submodule "modules/MockDataStoreService"]
+	path = modules/MockDataStoreService
+	url = https://github.com/buildthomas/MockDataStoreService/
