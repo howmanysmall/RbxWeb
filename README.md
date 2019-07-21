@@ -1,5 +1,7 @@
 # RbxWeb
-Roblox DataStore module
+RbxWeb is a DataStoreService wrapper with the goal of being easy to use and preventing data loss in mind. The API is very similar to the vanilla DataStoreService which makes switching to RbxWeb very easy. The script is also documented entire, and can be read using [Documentation Reader](https://www.roblox.com/library/1836614749/Documentation-Reader). The script also supports using MockDataStoreService for easy offline testing.
+
+The example script below is a demo of how to use RbxWeb, as well as how to use it properly to prevent loss of data.
 
 ## Example Script
 ```Lua
@@ -82,6 +84,18 @@ while true do
 	end
 end
 ```
+
+## Features
+
+- Much easier to use than DataStore2, while also being easier on performance as well as not creating a new DataStore every time.
+- Similar API to DataStoreService.
+- Can prevent loss of data if utilized properly.
+- Automatic retrying calculated based off of the limits described [here](https://developer.roblox.com/en-us/articles/Datastore-Errors).
+- Built in support for MockDataStoreService.
+- Lots of type checking to make sure nothing can be done incorrectly.
+- Documentated entirely through and through.
+- Functions are automatically pcall-ed and will return two values as such.
+- GetSortedAsync automatically iterates through DataStorePages for you.
 
 ## Documentation
 <details>
