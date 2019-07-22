@@ -66,6 +66,13 @@ local function PlayerRemoving(Player)
 	end
 end
 
+game:BindToClose(function()
+	for _, Player in ipairs(Players:GetPlayers()) do
+		local Thread = coroutine.create(PlayerRemoving)
+		coroutine.resume(Thread, Player)
+	end
+end)
+
 Players.PlayerAdded:Connect(PlayerAdded)
 Players.PlayerRemoving:Connect(PlayerRemoving)
 
@@ -101,7 +108,7 @@ end
 <details>
 <summary><code>function RbxWeb:Initialize(DataModel)</code></summary>
 
-Initializes RbxWeb.
+Initializes RbxWeb. Should only be called once.
 
 **Parameters:**
 - `[InstanceOrFunction]`  
