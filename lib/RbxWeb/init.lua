@@ -7,7 +7,7 @@ local Players = game:GetService("Players")
 local assert = assert
 local typeof = typeof
 
-local RbxWeb = { }
+local RbxWeb = {}
 
 local CurrentLength = #Players:GetPlayers() do
 	local function PlayerAdded()
@@ -23,7 +23,7 @@ local CurrentLength = #Players:GetPlayers() do
 end
 
 local DataStoreService = nil
-local DataStores = { }
+local DataStores = {}
 local Yield = false
 local StandardWait = 0.5
 local ErrorFunction = warn
@@ -40,7 +40,7 @@ end
 local function PushGenericQueue(Callback, Yielder)
 	if not Yield then
 		Yield = true
-		local Data = { Callback() }
+		local Data = {Callback()}
 		wait(Yielder())
 		Yield = false
 		return unpack(Data)
@@ -50,7 +50,7 @@ local function PushGenericQueue(Callback, Yielder)
 	end
 end
 
-local TypeCache = { }
+local TypeCache = {}
 
 local function BetterTypeOf(Object, DictionaryReplacesTable, FloatReplacesNumber)
 	local ObjectType = typeof(Object)
@@ -95,7 +95,8 @@ function RbxWeb:Initialize(DataModel)
 	if Type == "Instance" and DataModel == game then
 		DataStoreService, UsingMock = DataModel:GetService("DataStoreService"), false
 	elseif Type == "function" and DataModel == require then -- Can't be too safe.
-		DataStoreService, UsingMock = unpack(DataModel(script.DataStoreService))
+		DataStoreService = DataModel(script.DataStoreService)
+		UsingMock = typeof(DataStoreService) == "Instance" and false or true
 	end
 end
 
@@ -176,10 +177,10 @@ function RbxWeb:GetGeneric(DataRoot)
 		assert(DataRoot:IsA("GlobalDataStore"), ("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)"):format(DataRoot.ClassName))
 	end
 
-	local Generic = { }
+	local Generic = {}
 	local GenericMeta = {
 		__index = function(_, Index)
-			return ({ Prefix = DataStores[DataRoot] })[Index]
+			return ({Prefix = DataStores[DataRoot]})[Index]
 		end;
 	}
 
@@ -327,10 +328,10 @@ function RbxWeb:GetOrdered(DataRoot)
 		assert(DataRoot:IsA("OrderedDataStore"), ("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)"):format(DataRoot.ClassName))
 	end
 
-	local Ordered = { }
+	local Ordered = {}
 	local OrderedMeta = {
 		__index = function(_, Index)
-			return ({ Prefix = DataStores[DataRoot] })[Index]
+			return ({Prefix = DataStores[DataRoot]})[Index]
 		end;
 	}
 
@@ -343,7 +344,7 @@ function RbxWeb:GetOrdered(DataRoot)
 		local IsAscending = Ascend or false
 		assert(type(IsAscending) == "boolean", ("bad argument #1 in Ordered::CollectData (expected boolean, got %s)"):format(typeof(IsAscending)))
 
-		local DataTable = { }
+		local DataTable = {}
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.GetSortedAsync, DataRoot, IsAscending, 100)
 		end, GetSortYieldTime)
