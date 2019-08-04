@@ -302,6 +302,42 @@ function RbxWeb:GetGeneric(DataRoot)
 		return Success, Data
 	end
 
+	--[[**
+		This is like DataStore2's ::GetTable() function, where it'll add missing data from the default data.
+		@param [String] Key The key identifying the entry being retrieved from the DataStore.
+		@param [NonNil] DefaultData The default data you are using as a base.
+		@param [OptionalBoolean] OverwriteData Determines whether or not you overwrite the previous data. Defaults to true.
+		@returns [Tuple<Boolean, Table>] Whether or not the attempt was successful and the updated value of the entry in the DataStore with the given key.
+	**--]]
+	function Generic:FixMissing(Key, DefaultData, OverwriteData)
+		OverwriteData = OverwriteData or true
+		assert(type(Key) == "string", ("bad argument #1 in Generic::FixMissing (string expected, got %s)"):format(typeof(Key)))
+		assert(DefaultData ~= nil, "bad argument #2 in Generic::FixMissing (non-nil expected, got nil)")
+		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+
+		local Success, PlayerData = self:GetAsync(Key)
+		if Success and not PlayerData then
+			warn("Warning! Player doesn't have any data!")
+			return Success, PlayerData
+		elseif Success and PlayerData then
+			assert(type(PlayerData) == "table", ("bad result type from Generic::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
+			local DataChanged = false
+
+			for Index, Value in pairs(DefaultData) do
+				if PlayerData[Index] == nil then
+					PlayerData[Index] = Value
+					DataChanged = true
+				end
+			end
+
+			if OverwriteData and DataChanged then self:SetAsync(Key, PlayerData) end
+			return Success, PlayerData
+		else
+			warn("Something went wrong while running Generic::FixMissing.", debug.traceback(2))
+			return Success, PlayerData
+		end
+	end
+
 	-- Legacy RbxWeb API
 	Generic.__GetKey = Generic.GetKey
 	Generic.__GetAsync = Generic.GetAsync
@@ -490,6 +526,42 @@ function RbxWeb:GetOrdered(DataRoot)
 		end
 
 		return Success, Data
+	end
+
+	--[[**
+		This is like DataStore2's ::GetTable() function, where it'll add missing data from the default data.
+		@param [String] Key The key identifying the entry being retrieved from the DataStore.
+		@param [NonNil] DefaultData The default data you are using as a base.
+		@param [OptionalBoolean] OverwriteData Determines whether or not you overwrite the previous data. Defaults to true.
+		@returns [Tuple<Boolean, Table>] Whether or not the attempt was successful and the updated value of the entry in the DataStore with the given key.
+	**--]]
+	function Ordered:FixMissing(Key, DefaultData, OverwriteData)
+		OverwriteData = OverwriteData or true
+		assert(type(Key) == "string", ("bad argument #1 in Ordered::FixMissing (string expected, got %s)"):format(typeof(Key)))
+		assert(DefaultData ~= nil, "bad argument #2 in Ordered::FixMissing (non-nil expected, got nil)")
+		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+
+		local Success, PlayerData = self:GetAsync(Key)
+		if Success and not PlayerData then
+			warn("Warning! Player doesn't have any data!")
+			return Success, PlayerData
+		elseif Success and PlayerData then
+			assert(type(PlayerData) == "table", ("bad result type from Ordered::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
+			local DataChanged = false
+
+			for Index, Value in pairs(DefaultData) do
+				if PlayerData[Index] == nil then
+					PlayerData[Index] = Value
+					DataChanged = true
+				end
+			end
+
+			if OverwriteData and DataChanged then self:SetAsync(Key, PlayerData) end
+			return Success, PlayerData
+		else
+			warn("Something went wrong while running Ordered::FixMissing.", debug.traceback(2))
+			return Success, PlayerData
+		end
 	end
 
 	-- Legacy RbxWeb API
