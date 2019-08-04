@@ -159,7 +159,6 @@ local ACCEPTED_DATA_STORE_TYPES = {
 	["boolean"] = true;
 	["string"] = true;
 	["number"] = true;
---	["nil"] = maybe?;
 }
 
 --[[**
@@ -177,7 +176,7 @@ function RbxWeb:GetGeneric(DataRoot)
 		assert(DataRoot:IsA("GlobalDataStore"), ("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)"):format(DataRoot.ClassName))
 	end
 
-	local Generic = {}
+	local Generic = {Backups = {}}
 	local GenericMeta = {
 		__index = function(_, Index)
 			return ({Prefix = DataStores[DataRoot]})[Index]
@@ -336,6 +335,14 @@ function RbxWeb:GetGeneric(DataRoot)
 			warn("Something went wrong while running Generic::FixMissing.", debug.traceback(2))
 			return Success, PlayerData
 		end
+	end
+
+	function Generic:AddBackup(Key, CurrentData)
+		print("Coming soon!")
+	end
+
+	function Generic:SaveBackups()
+		print("Coming soon!")
 	end
 
 	-- Legacy RbxWeb API
