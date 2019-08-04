@@ -288,6 +288,24 @@ Delta The increment amount.
 </details>
 
 <details>
+<summary><code>function Generic:FixMissing(Key, DefaultData, OverwriteData)</code></summary>
+
+This is like DataStore2's ::GetTable() function, where it'll add missing data from the default data.
+
+**Parameters:**
+- `[String]`  
+Key The key identifying the entry being retrieved from the DataStore.
+- `[NonNil]`  
+DefaultData The default data you are using as a base.
+- `[OptionalBoolean]`  
+OverwriteData Determines whether or not you overwrite the previous data. Defaults to true.
+
+**Returns:**  
+[Tuple<Boolean, Table>] Whether or not the attempt was successful and the updated value of the entry in the DataStore with the given key.
+
+</details>
+
+<details>
 <summary><code>function RbxWeb:GetOrdered(DataRoot)</code></summary>
 
 Gets the methods of the given OrderedDataStore.
@@ -405,3 +423,20 @@ Delta The increment amount.
 
 </details>
 
+<details>
+<summary><code>function Ordered:FixMissing(Key, DefaultData, OverwriteData)</code></summary>
+
+This is like DataStore2's ::GetTable() function, where it'll add missing data from the default data.
+
+**Parameters:**
+- `[String]`  
+Key The key identifying the entry being retrieved from the DataStore.
+- `[NonNil]`  
+DefaultData The default data you are using as a base.
+- `[OptionalBoolean]`  
+OverwriteData Determines whether or not you overwrite the previous data. Defaults to true.
+
+**Returns:**  
+[Tuple<Boolean, Table>] Whether or not the attempt was successful and the updated value of the entry in the DataStore with the given key.
+
+</details>
