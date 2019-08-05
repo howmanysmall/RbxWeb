@@ -26,12 +26,8 @@ local GameDataStore = RbxWeb:GetGeneric(RbxWeb:AddGeneric(
 
 local function PlayerAdded(Player)
 	local PlayerKey = GameDataStore:GetKey(Player.UserId)
-	local Success, PlayerData = GameDataStore:GetAsync(PlayerKey)
-
-	if Success and not PlayerData then
-		PlayerData = DEFAULT_DATA
-		GameDataStore:SetAsync(PlayerKey, PlayerData)
-	end
+	local Success, PlayerData = GameDataStore:FixMissing(PlayerKey, DEFAULT_DATA, true)
+	if not Success then warn("DataStores are experiencing issues, maybe.") end
 
 	local Leaderstats = Instance.new("Folder")
 	Leaderstats.Name = "leaderstats"
@@ -66,15 +62,15 @@ local function PlayerRemoving(Player)
 	end
 end
 
+Players.PlayerAdded:Connect(PlayerAdded)
+Players.PlayerRemoving:Connect(PlayerRemoving)
+
 game:BindToClose(function()
 	for _, Player in ipairs(Players:GetPlayers()) do
 		local Thread = coroutine.create(PlayerRemoving)
 		coroutine.resume(Thread, Player)
 	end
 end)
-
-Players.PlayerAdded:Connect(PlayerAdded)
-Players.PlayerRemoving:Connect(PlayerRemoving)
 
 while true do
 	wait(5)
