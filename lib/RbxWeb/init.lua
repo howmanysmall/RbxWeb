@@ -312,7 +312,7 @@ function RbxWeb:GetGeneric(DataRoot)
 		OverwriteData = OverwriteData or true
 		assert(type(Key) == "string", ("bad argument #1 in Generic::FixMissing (string expected, got %s)"):format(typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Generic::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", ("bad argument #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
@@ -546,7 +546,7 @@ function RbxWeb:GetOrdered(DataRoot)
 		OverwriteData = OverwriteData or true
 		assert(type(Key) == "string", ("bad argument #1 in Ordered::FixMissing (string expected, got %s)"):format(typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Ordered::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", ("bad argument #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
