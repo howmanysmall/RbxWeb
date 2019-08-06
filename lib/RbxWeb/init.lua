@@ -95,8 +95,7 @@ function RbxWeb:Initialize(DataModel)
 	if Type == "Instance" and DataModel == game then
 		DataStoreService, UsingMock = DataModel:GetService("DataStoreService"), false
 	elseif Type == "function" and DataModel == require then -- Can't be too safe.
-		DataStoreService = DataModel(script.DataStoreService)
-		UsingMock = typeof(DataStoreService) == "Instance" and false or true
+		DataStoreService, UsingMock = unpack(DataModel(script.DataStoreService))
 	end
 end
 
@@ -159,6 +158,7 @@ local ACCEPTED_DATA_STORE_TYPES = {
 	["boolean"] = true;
 	["string"] = true;
 	["number"] = true;
+--	["nil"] = maybe?;
 }
 
 --[[**
@@ -176,7 +176,7 @@ function RbxWeb:GetGeneric(DataRoot)
 		assert(DataRoot:IsA("GlobalDataStore"), ("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)"):format(DataRoot.ClassName))
 	end
 
-	local Generic = {Backups = {}}
+	local Generic = {}
 	local GenericMeta = {
 		__index = function(_, Index)
 			return ({Prefix = DataStores[DataRoot]})[Index]
@@ -312,13 +312,18 @@ function RbxWeb:GetGeneric(DataRoot)
 		OverwriteData = OverwriteData or true
 		assert(type(Key) == "string", ("bad argument #1 in Generic::FixMissing (string expected, got %s)"):format(typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Generic::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad argument #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
 			warn("Warning! Player doesn't have any data!")
-			return Success, PlayerData
-		elseif Success and PlayerData then
+			if OverwriteData then
+				PlayerData = DefaultData
+				self:SetAsync(Key, PlayerData)
+			end
+		end
+
+		if Success and PlayerData then
 			assert(type(PlayerData) == "table", ("bad result type from Generic::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
 			local DataChanged = false
 
@@ -335,14 +340,6 @@ function RbxWeb:GetGeneric(DataRoot)
 			warn("Something went wrong while running Generic::FixMissing.", debug.traceback(2))
 			return Success, PlayerData
 		end
-	end
-
-	function Generic:AddBackup(Key, CurrentData)
-		print("Coming soon!")
-	end
-
-	function Generic:SaveBackups()
-		print("Coming soon!")
 	end
 
 	-- Legacy RbxWeb API
@@ -546,13 +543,18 @@ function RbxWeb:GetOrdered(DataRoot)
 		OverwriteData = OverwriteData or true
 		assert(type(Key) == "string", ("bad argument #1 in Ordered::FixMissing (string expected, got %s)"):format(typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Ordered::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad argument #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
 			warn("Warning! Player doesn't have any data!")
-			return Success, PlayerData
-		elseif Success and PlayerData then
+			if OverwriteData then
+				PlayerData = DefaultData
+				self:SetAsync(Key, PlayerData)
+			end
+		end
+
+		if Success and PlayerData then
 			assert(type(PlayerData) == "table", ("bad result type from Ordered::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
 			local DataChanged = false
 
