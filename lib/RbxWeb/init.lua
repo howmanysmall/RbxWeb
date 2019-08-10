@@ -84,6 +84,17 @@ local function BetterTypeOf(Object, DictionaryReplacesTable, FloatReplacesNumber
 	end
 end
 
+local function RecursivelyFix(DataChanged, DefaultData, PlayerData)
+	for Index, Value in pairs(DefaultData) do
+		if type(PlayerData[Index]) == "table" then
+			RecursivelyFix(DataChanged, Value, PlayerData[Index])
+		elseif PlayerData[Index] == nil then
+			PlayerData[Index] = Value
+			DataChanged = true
+		end
+	end
+end
+
 --[[**
 	Initializes RbxWeb. Should only be called once.
 	@param [InstanceOrFunction] DataModel This should either be `game` for the default DataStoreService or `require` for MockDataStoreService.
@@ -158,7 +169,6 @@ local ACCEPTED_DATA_STORE_TYPES = {
 	["boolean"] = true;
 	["string"] = true;
 	["number"] = true;
---	["nil"] = maybe?;
 }
 
 --[[**
@@ -326,13 +336,7 @@ function RbxWeb:GetGeneric(DataRoot)
 		if Success and PlayerData then
 			assert(type(PlayerData) == "table", ("bad result type from Generic::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
 			local DataChanged = false
-
-			for Index, Value in pairs(DefaultData) do
-				if PlayerData[Index] == nil then
-					PlayerData[Index] = Value
-					DataChanged = true
-				end
-			end
+			RecursivelyFix(DataChanged, DefaultData, PlayerData)
 
 			if OverwriteData and DataChanged then self:SetAsync(Key, PlayerData) end
 			return Success, PlayerData
@@ -557,13 +561,7 @@ function RbxWeb:GetOrdered(DataRoot)
 		if Success and PlayerData then
 			assert(type(PlayerData) == "table", ("bad result type from Ordered::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
 			local DataChanged = false
-
-			for Index, Value in pairs(DefaultData) do
-				if PlayerData[Index] == nil then
-					PlayerData[Index] = Value
-					DataChanged = true
-				end
-			end
+			RecursivelyFix(DataChanged, DefaultData, PlayerData)
 
 			if OverwriteData and DataChanged then self:SetAsync(Key, PlayerData) end
 			return Success, PlayerData
