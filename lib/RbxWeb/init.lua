@@ -43,7 +43,7 @@ local function PushGenericQueue(Callback, Yielder)
 		local Data = {Callback()}
 		wait(Yielder())
 		Yield = false
-		return unpack(Data)
+		return table.unpack(Data)
 	else
 		wait(StandardWait)
 		return PushGenericQueue(Callback, Yielder)
@@ -106,7 +106,8 @@ function RbxWeb:Initialize(DataModel)
 	if Type == "Instance" and DataModel == game then
 		DataStoreService, UsingMock = DataModel:GetService("DataStoreService"), false
 	elseif Type == "function" and DataModel == require then -- Can't be too safe.
-		DataStoreService, UsingMock = unpack(DataModel(script.DataStoreService))
+		DataStoreService = DataModel(script.DataStoreService)
+		if typeof(DataStoreService) ~= "Instance" then UsingMock = true end
 	end
 end
 
