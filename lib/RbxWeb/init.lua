@@ -24,6 +24,8 @@ end
 
 local DataStoreService = nil
 local DataStores = {}
+local RbxWebBackups = {}
+
 local Yield = false
 local StandardWait = 0.5
 local ErrorFunction = warn
@@ -137,9 +139,9 @@ end
 	@returns [GlobalDataStore] Your generic DataStore.
 **--]]
 function RbxWeb:AddGeneric(Key, Scope, Prefix)
-	assert(type(Key) == "string", ("bad argument #1 in RbxWeb::AddGeneric (string expected, instead got %s)"):format(typeof(Key)))
-	assert(type(Scope) == "string" or Scope == nil, ("bad argument #2 in RbxWeb::AddGeneric (string expected, instead got %s)"):format(typeof(Scope)))
-	assert(type(Prefix) == "string" or Prefix == nil, ("bad argument #3 in RbxWeb::AddGeneric (string expected, instead got %s)"):format(typeof(Prefix)))
+	assert(type(Key) == "string", string.format("bad argument #1 in RbxWeb::AddGeneric (string expected, instead got %s)", typeof(Key)))
+	assert(type(Scope) == "string" or Scope == nil, string.format("bad argument #2 in RbxWeb::AddGeneric (string expected, instead got %s)", typeof(Scope)))
+	assert(type(Prefix) == "string" or Prefix == nil, string.format("bad argument #3 in RbxWeb::AddGeneric (string expected, instead got %s)", typeof(Prefix)))
 
 	local KeyPrefix = Prefix or ""
 	local DataStore = DataStoreService:GetDataStore(Key, Scope)
@@ -155,9 +157,9 @@ end
 	@returns [OrderedDataStore] Your ordered DataStore.
 **--]]
 function RbxWeb:AddOrdered(Key, Scope, Prefix)
-	assert(type(Key) == "string", ("bad argument #1 in RbxWeb::AddOrdered (string expected, instead got %s)"):format(typeof(Key)))
-	assert(type(Scope) == "string" or Scope == nil, ("bad argument #2 in RbxWeb::AddOrdered (string expected, instead got %s)"):format(typeof(Scope)))
-	assert(type(Prefix) == "string" or Prefix == nil, ("bad argument #3 in RbxWeb::AddOrdered (string expected, instead got %s)"):format(typeof(Prefix)))
+	assert(type(Key) == "string", string.format("bad argument #1 in RbxWeb::AddOrdered (string expected, instead got %s)", typeof(Key)))
+	assert(type(Scope) == "string" or Scope == nil, string.format("bad argument #2 in RbxWeb::AddOrdered (string expected, instead got %s)", typeof(Scope)))
+	assert(type(Prefix) == "string" or Prefix == nil, string.format("bad argument #3 in RbxWeb::AddOrdered (string expected, instead got %s)", typeof(Prefix)))
 
 	local KeyPrefix = Prefix or ""
 	local DataStore = DataStoreService:GetOrderedDataStore(Key, Scope)
@@ -180,11 +182,11 @@ local ACCEPTED_DATA_STORE_TYPES = {
 function RbxWeb:GetGeneric(DataRoot)
 	local DataRootType = typeof(DataRoot)
 	if UsingMock then
-		assert(DataRootType == "table", ("bad argument #1 in RbxWeb::GetGeneric (table expected, instead got %s)"):format(DataRootType))
-		assert(DataRoot.__type == "GlobalDataStore", ("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)"):format(tostring(DataRootType.__type)))
+		assert(DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetGeneric (table expected, instead got %s)", DataRootType))
+		assert(DataRoot.__type == "GlobalDataStore", string.format("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)", tostring(DataRootType.__type)))
 	else
-		assert(DataRootType == "Instance", ("bad argument #1 in RbxWeb::GetGeneric (Instance expected, instead got %s)"):format(DataRootType))
-		assert(DataRoot:IsA("GlobalDataStore"), ("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)"):format(DataRoot.ClassName))
+		assert(DataRootType == "Instance", string.format("bad argument #1 in RbxWeb::GetGeneric (Instance expected, instead got %s)", DataRootType))
+		assert(DataRoot:IsA("GlobalDataStore"), string.format("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)", DataRoot.ClassName))
 	end
 
 	local Generic = {}
@@ -210,8 +212,8 @@ function RbxWeb:GetGeneric(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value saved.
 	**--]]
 	function Generic:GetAsync(Key)
-		assert(type(Key) == "string", ("bad argument #1 in Generic::GetAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Generic::GetAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::GetAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Generic::GetAsync (expected length <= 50, got %d)", #Key))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.GetAsync, DataRoot, Key)
@@ -231,10 +233,10 @@ function RbxWeb:GetGeneric(DataRoot)
 		@returns [Tuple<Boolean, String>] Whether or not the attempt was successful and the possible error message if not successful.
 	**--]]
 	function Generic:SetAsync(Key, Value)
-		assert(type(Key) == "string", ("bad argument #1 in Generic::SetAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Generic::SetAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::SetAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Generic::SetAsync (expected length <= 50, got %d)", #Key))
 		local ValueType = typeof(Value)
-		assert(ACCEPTED_DATA_STORE_TYPES[ValueType] == true, ("bad argument #2 in Generic::SetAsync (table, boolean, string, or number expected, got %s)"):format(ValueType))
+		assert(ACCEPTED_DATA_STORE_TYPES[ValueType] == true, string.format("bad argument #2 in Generic::SetAsync (table, boolean, string, or number expected, got %s)", ValueType))
 
 		local Success, Error = PushGenericQueue(function()
 			return pcall(DataRoot.SetAsync, DataRoot, Key, Value)
@@ -254,9 +256,9 @@ function RbxWeb:GetGeneric(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value of the entry in the DataStore with the given key.
 	**--]]
 	function Generic:UpdateAsync(Key, Callback)
-		assert(type(Key) == "string", ("bad argument #1 in Generic::UpdateAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Generic::UpdateAsync (expected length <= 50, got %d)"):format(#Key))
-		assert(type(Callback) == "function", ("bad argument #2 in Generic::UpdateAsync (function expected, got %s)"):format(typeof(Callback)))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::UpdateAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Generic::UpdateAsync (expected length <= 50, got %d)", #Key))
+		assert(type(Callback) == "function", string.format(typeof("bad argument #2 in Generic::UpdateAsync (function expected, got %s)", Callback)))
 
 		local Success, Error = PushGenericQueue(function()
 			return pcall(DataRoot.UpdateAsync, DataRoot, Key, Callback)
@@ -275,8 +277,8 @@ function RbxWeb:GetGeneric(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value that was associated with the DataStore key, or nil if the key was not found.
 	**--]]
 	function Generic:RemoveAsync(Key)
-		assert(type(Key) == "string", ("bad argument #1 in Generic::RemoveAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Generic::RemoveAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::RemoveAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Generic::RemoveAsync (expected length <= 50, got %d)", #Key))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.RemoveAsync, DataRoot, Key)
@@ -296,10 +298,10 @@ function RbxWeb:GetGeneric(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value of the entry in the DataStore with the given key.
 	**--]]
 	function Generic:IncrementAsync(Key, Delta)
-		assert(type(Key) == "string", ("bad argument #1 in Generic::IncrementAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Generic::IncremenetAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::IncrementAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Generic::IncremenetAsync (expected length <= 50, got %d)", #Key))
 		local DeltaType = BetterTypeOf(Delta, false, true)
-		assert(DeltaType == "integer", ("bad argument #2 in Generic::IncrementAsync (integer expected, got %s)"):format(DeltaType))
+		assert(DeltaType == "integer", string.format("bad argument #2 in Generic::IncrementAsync (integer expected, got %s)", DeltaType))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.IncrementAsync, DataRoot, Key, Delta)
@@ -321,9 +323,9 @@ function RbxWeb:GetGeneric(DataRoot)
 	**--]]
 	function Generic:FixMissing(Key, DefaultData, OverwriteData)
 		OverwriteData = OverwriteData or true
-		assert(type(Key) == "string", ("bad argument #1 in Generic::FixMissing (string expected, got %s)"):format(typeof(Key)))
+		assert(type(Key) == "string", string.format("bad argument #1 in Generic::FixMissing (string expected, got %s)", typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Generic::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Generic::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", string.format("bad arguments #3 in Generic::FixMissing (boolean expected, got %s)", typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
@@ -335,7 +337,7 @@ function RbxWeb:GetGeneric(DataRoot)
 		end
 
 		if Success and PlayerData then
-			assert(type(PlayerData) == "table", ("bad result type from Generic::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
+			assert(type(PlayerData) == "table", string.format("bad result type from Generic::GetAsync (expected table, got %s)", typeof(PlayerData)))
 			local DataChanged = false
 			RecursivelyFix(DataChanged, DefaultData, PlayerData)
 
@@ -366,11 +368,11 @@ end
 function RbxWeb:GetOrdered(DataRoot)
 	local DataRootType = typeof(DataRoot)
 	if UsingMock then
-		assert(DataRootType == "table", ("bad argument #1 in RbxWeb::GetOrdered (table expected, instead got %s)"):format(DataRootType))
-		assert(DataRoot.__type == "OrderedDataStore", ("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)"):format(tostring(DataRootType.__type)))
+		assert(DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetOrdered (table expected, instead got %s)", DataRootType))
+		assert(DataRoot.__type == "OrderedDataStore", string.format("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)", tostring(DataRootType.__type)))
 	else
-		assert(DataRootType == "Instance", ("bad argument #1 in RbxWeb::GetOrdered (Instance expected, instead got %s)"):format(DataRootType))
-		assert(DataRoot:IsA("OrderedDataStore"), ("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)"):format(DataRoot.ClassName))
+		assert(DataRootType == "Instance", string.format("bad argument #1 in RbxWeb::GetOrdered (Instance expected, instead got %s)", DataRootType))
+		assert(DataRoot:IsA("OrderedDataStore"), string.format("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)", DataRoot.ClassName))
 	end
 
 	local Ordered = {}
@@ -387,7 +389,7 @@ function RbxWeb:GetOrdered(DataRoot)
 	**--]]
 	function Ordered:CollectData(Ascend)
 		local IsAscending = Ascend or false
-		assert(type(IsAscending) == "boolean", ("bad argument #1 in Ordered::CollectData (expected boolean, got %s)"):format(typeof(IsAscending)))
+		assert(type(IsAscending) == "boolean", string.format("bad argument #1 in Ordered::CollectData (expected boolean, got %s)", typeof(IsAscending)))
 
 		local DataTable = {}
 		local Success, Data = PushGenericQueue(function()
@@ -435,8 +437,8 @@ function RbxWeb:GetOrdered(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value saved.
 	**--]]
 	function Ordered:GetAsync(Key)
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::GetAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Ordered::GetAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format(typeof("bad argument #1 in Ordered::GetAsync (string expected, got %s)", Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Ordered::GetAsync (expected length <= 50, got %d)", #Key))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.GetAsync, DataRoot, Key)
@@ -456,10 +458,10 @@ function RbxWeb:GetOrdered(DataRoot)
 		@returns [Tuple<Boolean, String>] Whether or not the attempt was successful and the possible error message if not successful.
 	**--]]
 	function Ordered:SetAsync(Key, Value)
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::SetAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Ordered::SetAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Ordered::SetAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Ordered::SetAsync (expected length <= 50, got %d)", #Key))
 		local ValueType = typeof(Value)
-		assert(ACCEPTED_DATA_STORE_TYPES[ValueType] == true, ("bad argument #2 in Ordered::SetAsync (table, boolean, string, or number expected, got %s)"):format(ValueType))
+		assert(ACCEPTED_DATA_STORE_TYPES[ValueType] == true, string.format("bad argument #2 in Ordered::SetAsync (table, boolean, string, or number expected, got %s)", ValueType))
 
 		local Success, Error = PushGenericQueue(function()
 			return pcall(DataRoot.SetAsync, DataRoot, Key, Value)
@@ -479,9 +481,9 @@ function RbxWeb:GetOrdered(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value of the entry in the DataStore with the given key.
 	**--]]
 	function Ordered:UpdateAsync(Key, Callback)
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::UpdateAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Ordered::UpdateAsync (expected length <= 50, got %d)"):format(#Key))
-		assert(type(Callback) == "function", ("bad argument #2 in Ordered::UpdateAsync (function expected, got %s)"):format(typeof(Callback)))
+		assert(type(Key) == "string", string.format("bad argument #1 in Ordered::UpdateAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Ordered::UpdateAsync (expected length <= 50, got %d)", #Key))
+		assert(type(Callback) == "function", string.format("bad argument #2 in Ordered::UpdateAsync (function expected, got %s)", typeof(Callback)))
 
 		local Success, Error = PushGenericQueue(function()
 			return pcall(DataRoot.UpdateAsync, DataRoot, Key, Callback)
@@ -500,8 +502,8 @@ function RbxWeb:GetOrdered(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value that was associated with the DataStore key, or nil if the key was not found.
 	**--]]
 	function Ordered:RemoveAsync(Key)
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::RemoveAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Ordered::RemoveAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Ordered::RemoveAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Ordered::RemoveAsync (expected length <= 50, got %d)", #Key))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.RemoveAsync, DataRoot, Key)
@@ -521,10 +523,10 @@ function RbxWeb:GetOrdered(DataRoot)
 		@returns [Tuple<Boolean, Variant>] Whether or not the attempt was successful and the value of the entry in the DataStore with the given key.
 	**--]]
 	function Ordered:IncrementAsync(Key, Delta)
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::IncrementAsync (string expected, got %s)"):format(typeof(Key)))
-		assert(#Key <= 50, ("bad argument #1 in Ordered::IncrementAsync (expected length <= 50, got %d)"):format(#Key))
+		assert(type(Key) == "string", string.format("bad argument #1 in Ordered::IncrementAsync (string expected, got %s)", typeof(Key)))
+		assert(#Key <= 50, string.format("bad argument #1 in Ordered::IncrementAsync (expected length <= 50, got %d)", #Key))
 		local DeltaType = BetterTypeOf(Delta, true, true)
-		assert(DeltaType == "integer", ("bad argument #2 in Ordered::IncrementAsync (integer expected, got %s)"):format(DeltaType))
+		assert(DeltaType == "integer", string.format("bad argument #2 in Ordered::IncrementAsync (integer expected, got %s)", DeltaType))
 
 		local Success, Data = PushGenericQueue(function()
 			return pcall(DataRoot.IncrementAsync, DataRoot, Key, Delta)
@@ -546,9 +548,9 @@ function RbxWeb:GetOrdered(DataRoot)
 	**--]]
 	function Ordered:FixMissing(Key, DefaultData, OverwriteData)
 		OverwriteData = OverwriteData or true
-		assert(type(Key) == "string", ("bad argument #1 in Ordered::FixMissing (string expected, got %s)"):format(typeof(Key)))
+		assert(type(Key) == "string", string.format("bad argument #1 in Ordered::FixMissing (string expected, got %s)", typeof(Key)))
 		assert(DefaultData ~= nil, "bad argument #2 in Ordered::FixMissing (non-nil expected, got nil)")
-		assert(type(OverwriteData) == "boolean", ("bad arguments #3 in Ordered::FixMissing (boolean expected, got %s)"):format(typeof(OverwriteData)))
+		assert(type(OverwriteData) == "boolean", string.format("bad arguments #3 in Ordered::FixMissing (boolean expected, got %s)", typeof(OverwriteData)))
 
 		local Success, PlayerData = self:GetAsync(Key)
 		if Success and not PlayerData then
@@ -560,7 +562,7 @@ function RbxWeb:GetOrdered(DataRoot)
 		end
 
 		if Success and PlayerData then
-			assert(type(PlayerData) == "table", ("bad result type from Ordered::GetAsync (expected table, got %s)"):format(typeof(PlayerData)))
+			assert(type(PlayerData) == "table", string.format("bad result type from Ordered::GetAsync (expected table, got %s)", typeof(PlayerData)))
 			local DataChanged = false
 			RecursivelyFix(DataChanged, DefaultData, PlayerData)
 
