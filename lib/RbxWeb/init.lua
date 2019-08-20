@@ -181,12 +181,12 @@ local ACCEPTED_DATA_STORE_TYPES = {
 **--]]
 function RbxWeb:GetGeneric(DataRoot)
 	local DataRootType = typeof(DataRoot)
-	if UsingMock then
-		assert(DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetGeneric (table expected, instead got %s)", DataRootType))
-		assert(DataRoot.__type == "GlobalDataStore", string.format("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)", tostring(DataRootType.__type)))
-	else
-		assert(DataRootType == "Instance", string.format("bad argument #1 in RbxWeb::GetGeneric (Instance expected, instead got %s)", DataRootType))
+	assert(DataRootType == "Instance" or DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetGeneric (Instance or table expected, instead got %s)", DataRootType))
+
+	if DataRoot.IsA then
 		assert(DataRoot:IsA("GlobalDataStore"), string.format("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)", DataRoot.ClassName))
+	elseif DataRoot.__type then
+		assert(DataRoot.__type == "GlobalDataStore", string.format("bad argument #1 in RbxWeb::GetGeneric (GlobalDataStore expected, instead got %s)", tostring(DataRoot.__type)))
 	end
 
 	local Generic = {}
@@ -367,12 +367,12 @@ end
 **--]]
 function RbxWeb:GetOrdered(DataRoot)
 	local DataRootType = typeof(DataRoot)
-	if UsingMock then
-		assert(DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetOrdered (table expected, instead got %s)", DataRootType))
-		assert(DataRoot.__type == "OrderedDataStore", string.format("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)", tostring(DataRootType.__type)))
-	else
-		assert(DataRootType == "Instance", string.format("bad argument #1 in RbxWeb::GetOrdered (Instance expected, instead got %s)", DataRootType))
+	assert(DataRootType == "Instance" or DataRootType == "table", string.format("bad argument #1 in RbxWeb::GetOrdered (Instance or table expected, instead got %s)", DataRootType))
+
+	if DataRoot.IsA then
 		assert(DataRoot:IsA("OrderedDataStore"), string.format("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)", DataRoot.ClassName))
+	elseif DataRoot.__type then
+		assert(DataRoot.__type == "OrderedDataStore", string.format("bad argument #1 in RbxWeb::GetOrdered (OrderedDataStore expected, instead got %s)", tostring(DataRoot.__type)))
 	end
 
 	local Ordered = {}
