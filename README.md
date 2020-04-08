@@ -1,6 +1,8 @@
 # RbxWeb
 RbxWeb is a DataStoreService wrapper with the goal of being easy to use and preventing data loss in mind. The API is very similar to the vanilla DataStoreService which makes switching to RbxWeb very easy. The script is also documented entire, and can be read using [Documentation Reader](https://www.roblox.com/library/1836614749/Documentation-Reader). The script also supports using [MockDataStoreService](https://github.com/buildthomas/MockDataStoreService/) for easy offline testing.
 
+This was originally made by my friend [movsb](https://www.roblox.com/users/77284141/profile). He made the original module for a game I was working on, and I've used it a lot since. Check out his [custom language L+](https://www.roblox.com/library/752810648/L-Programming-Suite) if you like custom languages or C.
+
 The example script below is a demo of how to use RbxWeb, as well as how to use it properly to prevent loss of data.
 
 ## Example Script
